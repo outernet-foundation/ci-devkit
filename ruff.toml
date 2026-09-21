@@ -1,0 +1,95 @@
+target-version = "py313"
+line-length = 120
+preview = true
+
+[lint]
+select = ["ALL"]
+ignore = [
+    # ── Permanent ─────────────────────────────────────────────────────────
+    # Type annotations — basedpyright strict mode handles this
+    "ANN",
+    # No docstrings, no copyright headers
+    "D",
+    "DOC",
+    "CPY",
+    # TODO/FIXME comment formatting
+    "TD",
+    "FIX",
+    # Exception message ergonomics — literal-indirection and custom-class churn without benefit
+    "raw-string-in-exception",
+    "f-string-in-exception",
+    "raise-vanilla-args",
+    # Class attribute names never conflict with builtins via self.x
+    "builtin-attribute-shadowing",
+    # Function-size counters — C901 already covers structural complexity
+    "too-many-return-statements",
+    "too-many-branches",
+    "too-many-arguments",
+    "too-many-locals",
+    "too-many-statements",
+    "too-many-positional-arguments",
+    # Typer's Option/Argument in argument defaults is typer's standard API pattern
+    "function-call-in-default-argument",
+    # Boolean parameters read fine as keyword-only flags here
+    "boolean-type-hint-positional-argument",
+    "boolean-default-value-positional-argument",
+    "boolean-positional-value-in-call",
+    # Relative imports are the intra-package convention
+    "relative-imports",
+    # Formatter-owned; enforced by `ruff format`
+    "missing-trailing-comma",
+    "unsorted-imports",
+    # Magic values in comparisons are readable in this CLI
+    "magic-value-comparison",
+    # The formatter owns wrapping; long string literals and URLs stay on one line
+    "line-too-long",
+    # src-layout tests need no __init__.py
+    "implicit-namespace-package",
+    # Runtime-used typing imports stay at module level
+    "typing-only-first-party-import",
+    "typing-only-third-party-import",
+    "typing-only-standard-library-import",
+    # Small literal tuples read fine in membership tests
+    "literal-membership",
+
+    # ── Deferred to PLE-248 — Enforce the deferred ruff rules
+    # https://linear.app/plerionplatforms/issue/PLE-248
+    # Mirrors placeframe's root ruff.toml transitional Ticket-N blocks; lifting
+    # a rule here should happen alongside lifting it from placeframe's ruff.toml.
+    "runtime-cast-value",    # move import into TYPE_CHECKING block (quoted annotation) — Ticket 1
+    "redundant-open-modes",    # unnecessary open mode parameters — Ticket 1
+    "read-whole-file",  # read-text can replace open+read — Ticket 2
+    "write-whole-file",  # write-text can replace open+write — Ticket 2
+    "repeated-append",  # use list.extend instead of repeated append — Ticket 2
+    "unspecified-encoding",  # open/read_text without explicit encoding — Ticket 2
+    "os-chmod",   # os.chmod → Path.chmod — Ticket 2
+    "os-path-isdir",   # os.path.isdir → Path.is_dir — Ticket 2
+    "os-path-join",   # os.path.join → Path / — Ticket 2
+    "builtin-open",   # open() → Path.open() — Ticket 2
+    "unnecessary-assign",   # unnecessary assignment before return — Ticket 2
+    "superfluous-else-return",   # unnecessary else after return — Ticket 2
+    "collection-literal-concatenation",   # consider spread operator instead of concatenation — Ticket 2
+    "collapsible-if",   # collapsible if statements — Ticket 2
+    "open-file-with-context-handler",   # use context manager for opening files — Ticket 2
+    "multiple-with-statements",   # use single with statement for multiple context managers — Ticket 2
+    "raise-without-from-inside-except",     # raise ... from inside except — Ticket 8
+    "blind-except",   # blind except Exception — Ticket 8
+    "try-consider-else",   # try/except/return — move return into else — Ticket 8
+    "complex-structure",     # function too complex — Ticket 9
+    "import-outside-top-level",  # import not at top level — Ticket 9
+    "global-statement",  # global statement — Ticket 9
+    "redefined-loop-name",  # loop variable overwritten — Ticket 9
+    "path-constructor-current-directory",   # do not pass "." explicitly to Path — Ticket 2
+    "bad-file-permissions",     # bad-file-permissions (0o755 on executable) — Ticket 9
+    "hardcoded-temp-file",     # hardcoded temp file / directory — Ticket 9
+    "suspicious-subprocess-import",     # suspicious subprocess import — Ticket 9
+    "subprocess-without-shell-equals-true",     # subprocess call with non-literal — Ticket 9
+    "start-process-with-partial-path",     # start-process-with-partial-path — Ticket 9
+
+    # ── Deferred to PLE-336 — Replace print() with structured logging
+    # https://linear.app/plerionplatforms/issue/PLE-336
+    "print",     # print found
+]
+
+[lint.flake8-builtins]
+ignorelist = ["id", "map"]
