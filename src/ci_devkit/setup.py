@@ -7,7 +7,7 @@ import shlex
 import shutil
 from pathlib import Path
 
-from bashrun import bash, bash_no_raise, bash_output
+from bashrun.bash import bash, bash_no_raise, bash_output
 from pydantic import Field
 from pydantic_settings import BaseSettings
 

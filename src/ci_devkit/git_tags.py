@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from bashrun import bash, bash_check, bash_output
+from bashrun.bash import bash, bash_check, bash_output
 
 
 def list_tag_versions(prefix: str) -> list[str]:
