@@ -15,29 +15,9 @@ settings = Settings.model_validate({})
 _summary_initialized = False
 
 
-def _format_duration(seconds: float) -> str:
-    if seconds < 60:
-        return f"{seconds:.1f}s"
-    minutes = int(seconds // 60)
-    remaining = seconds % 60
-    return f"{minutes}m {remaining:.0f}s"
-
-
-def _write_summary(label: str, duration: float, *, failed: bool) -> None:
-    global _summary_initialized
-    summary_path = settings.github_step_summary
-    if not summary_path:
-        return
-    with open(summary_path, "a") as file:
-        if not _summary_initialized:
-            file.write("| Step | Duration |\n|---|---|\n")
-            _summary_initialized = True
-        status = " :x:" if failed else ""
-        file.write(f"| {label}{status} | {_format_duration(duration)} |\n")
-
-
 @contextmanager
 def ci_step(label: str) -> Generator[None]:
+    global _summary_initialized
     print(f"::group::{label}", flush=True)
     start = time.monotonic()
     failed = False
@@ -49,4 +29,17 @@ def ci_step(label: str) -> Generator[None]:
     finally:
         duration = time.monotonic() - start
         print("::endgroup::", flush=True)
-        _write_summary(label, duration, failed=failed)
+
+        if settings.github_step_summary:
+            if duration < 60:
+                formatted_duration = f"{duration:.1f}s"
+            else:
+                minutes = int(duration // 60)
+                formatted_duration = f"{minutes}m {duration % 60:.0f}s"
+
+            with open(settings.github_step_summary, "a") as file:
+                if not _summary_initialized:
+                    file.write("| Step | Duration |\n|---|---|\n")
+                    _summary_initialized = True
+                status = " :x:" if failed else ""
+                file.write(f"| {label}{status} | {formatted_duration} |\n")

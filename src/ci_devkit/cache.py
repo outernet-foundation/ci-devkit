@@ -10,10 +10,6 @@ from subprocess import CalledProcessError
 from bashrun.bash import bash, bash_check, bash_pipe
 
 
-def _posix(path: Path) -> str:
-    return path.as_posix() if platform.system() == "Windows" else str(path)
-
-
 def restore(
     registry: str,
     name: str,
@@ -87,3 +83,7 @@ def save(registry: str, name: str, tag: str, source_directory: Path, paths: list
     bash(f"oras push {reference} {archive_name}:application/vnd.ci-devkit.cache.v1+zstd", cwd=staging)
     archive_path.unlink()
     print(f"Saved cache: {reference}")
+
+
+def _posix(path: Path) -> str:
+    return path.as_posix() if platform.system() == "Windows" else str(path)

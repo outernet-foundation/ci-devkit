@@ -42,19 +42,6 @@ LARGE_PACKAGE_PATTERNS = [
 ]
 
 
-def _remove_paths(paths: list[str], sudo: bool = False) -> None:
-    existing = [path for path in paths if Path(path).exists()]
-    if not existing:
-        return
-    if sudo:
-        bash_no_raise(f"sudo rm -rf {shlex.join(existing)}")
-    elif platform.system() == "Windows":
-        for path in existing:
-            shutil.rmtree(path, ignore_errors=True)
-    else:
-        bash_no_raise(f"rm -rf {shlex.join(existing)}")
-
-
 # actions/checkout sets safe.directory in a temporary HOME that's cleaned up
 # after the step finishes (actions/checkout#766). Container jobs that run
 # git later need it re-set in the real HOME.
@@ -125,3 +112,16 @@ def install_node(version: str, registry_url: str | None = None) -> None:
     Path(filename).unlink()
     if registry_url:
         (Path.home() / ".npmrc").write_text(f"registry={registry_url}\n")
+
+
+def _remove_paths(paths: list[str], sudo: bool = False) -> None:
+    existing = [path for path in paths if Path(path).exists()]
+    if not existing:
+        return
+    if sudo:
+        bash_no_raise(f"sudo rm -rf {shlex.join(existing)}")
+    elif platform.system() == "Windows":
+        for path in existing:
+            shutil.rmtree(path, ignore_errors=True)
+    else:
+        bash_no_raise(f"rm -rf {shlex.join(existing)}")
