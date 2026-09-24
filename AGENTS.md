@@ -8,7 +8,7 @@ The package is `ci_devkit` (src-layout under `src/ci_devkit/`); all dependencies
 
 ## Release flow
 
-Publishing rides `release.yml`, triggered by a successful CI run on a `main` push: the machinery — release-devkit's `publish-packages` (an inlined, version-pinned `uvx` step in the publish job, keeping OIDC identity local), never a project dependency (ci-devkit sits below release-devkit; a project-level edge would be a cycle) — computes the plan from the tag ledger and path-diff, patches the version ephemerally, and publishes to PyPI under OIDC trusted publishing (publisher bound to `release.yml`, no environment). The committed `pyproject.toml` version is permanently the `0.0.0.dev0` sentinel; the `ci-devkit-v*` tags are the version ledger (first release `0.1.0`, patch-auto thereafter). API-breaking changes ship with a manually bumped version — patch-auto assumes additive changes.
+Publishing rides `release.yml`, triggered by a successful CI run on a `main` push: the machinery — release-devkit's `publish-stable` (an inlined, version-pinned `uvx` step in the publish job, keeping OIDC identity local), never a project dependency (ci-devkit sits below release-devkit; a project-level edge would be a cycle) — computes the plan from the tag ledger and path-diff, patches the version ephemerally, and publishes to PyPI under OIDC trusted publishing (publisher bound to `release.yml`, no environment). The committed `pyproject.toml` version is permanently the `0.0.0.dev0` sentinel; the `ci-devkit-v*` tags are the version ledger (declared `major_minor` line in `publish-config.json`, patch-auto within the line). API-breaking changes ship with a manually bumped `major_minor` — patch-auto assumes additive changes.
 
 ## Shape
 
