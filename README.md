@@ -1,6 +1,6 @@
 # ci-devkit
 
-The CI runner floor for outernet-foundation repos: the GitHub Actions step wrapper, runner and toolchain provisioning (git config, disk space, .NET, Node, ORAS), git-tag helpers, and the OCI artifact cache. Every domain devkit (`python-devkit`, `unity-devkit`, `docker-devkit`, `release-devkit`, and future arrivals like `node-devkit`) builds on this package; it owns nothing domain-specific.
+The CI runner floor for outernet-foundation repos: the GitHub Actions step wrapper, runner and toolchain provisioning (git config, disk space, .NET, Node, ORAS), and the OCI artifact cache. Every domain devkit (`python-devkit`, `unity-devkit`, `docker-devkit`, `release-devkit`, and future arrivals like `node-devkit`) builds on this package; it owns nothing domain-specific.
 
 ## Setup
 
@@ -20,7 +20,6 @@ dependencies = ["ci-devkit>=0.1.0"]
 ```python
 from ci_devkit.cache import restore, save
 from ci_devkit.ci_step import ci_step
-from ci_devkit.git_tags import create_and_push_tag, has_changes_since_tag, list_tag_versions
 from ci_devkit.setup import configure_git, free_disk_space, install_dotnet, install_node
 from ci_devkit.setup_oras import install_oras
 ```
