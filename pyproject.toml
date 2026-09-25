@@ -1,7 +1,7 @@
 [project]
 name = "ci-devkit"
 version = "0.0.0.dev0"
-description = "CI runner floor: Actions step wrapper, runner and toolchain provisioning, git-tag helpers, and the OCI artifact cache"
+description = "CI runner floor: Actions step wrapper, runner and toolchain provisioning, and the OCI artifact cache"
 requires-python = ">=3.13"
 dependencies = [
     "bashrun>=0.1.0",
