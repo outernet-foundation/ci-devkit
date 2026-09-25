@@ -4,7 +4,9 @@
       "name": "ci-devkit",
       "path": ".",
       "major_minor": "0.1",
-      "feeds": { "pypi": "ci-devkit" }
+      "registries": {
+        "pypi": "ci-devkit"
+      }
     }
   ],
   "ci_workflow": "ci.yml"
