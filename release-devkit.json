@@ -1,13 +1,10 @@
 {
-  "packages": [
-    {
-      "name": "ci-devkit",
+  "packages": {
+    "ci-devkit": {
       "path": ".",
       "major_minor": "0.1",
-      "registries": {
-        "pypi": "ci-devkit"
-      }
+      "registries": { "pypi": "ci-devkit" }
     }
-  ],
+  },
   "ci_workflow": "ci.yml"
 }
