@@ -6,46 +6,61 @@ import shlex
 import shutil
 from pathlib import Path
 
-from bashrun.bash import bash
-from pydantic_settings import BaseSettings
+from bashrun.bash import bash, bash_check
 
-
-class Settings(BaseSettings):
-    github_token: str
-    github_actor: str = ""
-    github_path: str | None = None
-    runner_temp: str = "."
+from .registry_auth import ensure_registry_login
 
 
 def install_oras(version: str = "1.2.2") -> None:
-    settings = Settings.model_validate({})
+    if not shutil.which("oras"):
+        _download_oras(version)
+
+    if not shutil.which("oras"):
+        print("Error: the oras CLI is not on PATH and could not be provisioned. Install it manually:")
+        print("  macOS:  brew install oras")
+        print("  Linux:  https://oras.land/docs/install")
+        print("  Windows: scoop install oras")
+        raise SystemExit(1)
+
+    _ensure_zstd()
+    ensure_registry_login("ghcr.io")
+
+
+def _download_oras(version: str) -> None:
+    if not shutil.which("curl"):
+        return
+
     system = platform.system()
-    sudo = system == "Linux" and os.geteuid() != 0
-    prefix = "sudo " if sudo else ""
-
-    if system == "Linux":
-        bash(f"{prefix}apt-get update -qq")
-        bash(f"{prefix}apt-get install -y -qq zstd")
-    elif system == "Windows":
-        bash("choco install zstandard -y --no-progress")
-
     if system == "Linux":
         archive = f"oras_{version}_linux_amd64.tar.gz"
-        bash(f"curl -fsSLO https://github.com/oras-project/oras/releases/download/v{version}/{archive}")
-        bash(f"{prefix}tar -xzf {archive} -C /usr/local/bin/ oras")
-        Path(archive).unlink()
+        binary_directory = Path.home() / ".local" / "bin"
     elif system == "Windows":
         archive = f"oras_{version}_windows_amd64.zip"
-        oras_directory = Path(settings.runner_temp) / "oras"
-        bash(f"curl -fsSLO https://github.com/oras-project/oras/releases/download/v{version}/{archive}")
-        shutil.unpack_archive(archive, oras_directory)
-        Path(archive).unlink()
-        os.environ["PATH"] = f"{oras_directory}{os.pathsep}{os.environ['PATH']}"
-        if settings.github_path:
-            with open(settings.github_path, "a") as file:
-                file.write(f"{oras_directory}\n")
+        binary_directory = Path.home() / ".cache" / "ci-devkit" / "oras"
+    else:
+        return
 
-    bash(
-        f"oras login ghcr.io --username {shlex.quote(settings.github_actor)} --password-stdin",
-        stdin_text=settings.github_token,
+    binary_directory.mkdir(parents=True, exist_ok=True)
+    download_url = f"https://github.com/oras-project/oras/releases/download/v{version}/{archive}"
+    bash(f"curl -fsSLO {download_url}", cwd=binary_directory)
+
+    if system == "Linux":
+        bash(f"tar -xzf {shlex.quote(str(binary_directory / archive))} -C {binary_directory} oras")
+    else:
+        shutil.unpack_archive(str(binary_directory / archive), binary_directory)
+
+    (binary_directory / archive).unlink()
+    os.environ["PATH"] = f"{binary_directory}{os.pathsep}{os.environ['PATH']}"
+
+
+def _ensure_zstd() -> None:
+    if platform.system() != "Linux" or shutil.which("zstd"):
+        return
+
+    prefix = "sudo " if os.geteuid() != 0 and shutil.which("sudo") else ""
+    if bash_check(f"{prefix}apt-get update -qq") and bash_check(f"{prefix}apt-get install -y -qq zstd"):
+        return
+
+    print(
+        "Warning: zstd not installable; OCI cache operations that pack or unpack tar.zst artifacts require it on PATH"
     )
