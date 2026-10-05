@@ -8,7 +8,7 @@ The package is `ci_devkit` (src-layout under `src/ci_devkit/`); all dependencies
 
 ## Release flow
 
-release-devkit's `AGENTS.md` owns the three-workflow contract; this repo follows it unchanged. Repo-specific facts: release-devkit is never a project dependency (ci-devkit sits below release-devkit; a project-level edge would be a cycle), and while pre-1.0, breaking changes ride the current `0.1` patch line (a `major_minor` bump is reserved for the eventual 1.0.0 stabilization).
+release-devkit's `AGENTS.md` owns the three-workflow contract; this repo follows it unchanged. Repo-specific facts: release-devkit is never a project dependency (ci-devkit sits below release-devkit; a project-level edge would be a cycle), and API-breaking changes ship with a manually bumped `major_minor` (patch-auto assumes additive changes).
 
 This repo cannot take python-devkit as a dependency (python-devkit runtime-depends on ci-devkit; uv's resolver rejects the name-shadowing as a self-dependency), so its own preflight consumes python-devkit through the `tools/devkit/` sidecar: a `package = false` project named `ci-devkit-devkit` that exact-pins `python-devkit` — the different root name lets the dependency resolve to PyPI inside the sidecar's isolated env with no shadowing. `--project` uses the sidecar env but leaves cwd at the repo root, so preflight's child `uv run` calls (sync, ruff, basedpyright, …) re-discover ci-devkit's real project and run in ci-devkit's `.venv`. The committed `tools/devkit/uv.lock` is the single version surface, checked with `uv lock --check --project tools/devkit`.
 
