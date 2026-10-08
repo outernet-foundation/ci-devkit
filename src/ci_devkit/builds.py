@@ -38,21 +38,25 @@ def push_build(
     print(f"Pushed build: {reference}")
 
 
-def pull_build(
+def pull_artifact(
     registry: str,
     project: str,
     platform: str,
     tag: str,
     target_directory: Path,
     *,
+    required: bool = True,
     registry_username: str | None = None,
     registry_token: str | None = None,
-) -> None:
+) -> bool:
     ensure_registry_login(registry, username=registry_username, token=registry_token)
     reference = build_reference(registry, project, platform, tag)
+    if not required and not bash_check(f"oras manifest fetch {shlex.quote(reference)}"):
+        return False
     target_directory.mkdir(parents=True, exist_ok=True)
     bash(f"oras pull {shlex.quote(reference)} -o {shlex.quote(str(target_directory))}")
     print(f"Pulled build: {reference}")
+    return True
 
 
 def list_build_tags(
@@ -71,17 +75,3 @@ def list_build_tags(
         print(f"No tags found for {repository}")
         return []
     return [line.strip() for line in output.splitlines() if line.strip()]
-
-
-def build_exists(
-    registry: str,
-    project: str,
-    platform: str,
-    tag: str,
-    *,
-    registry_username: str | None = None,
-    registry_token: str | None = None,
-) -> bool:
-    ensure_registry_login(registry, username=registry_username, token=registry_token)
-    reference = build_reference(registry, project, platform, tag)
-    return bash_check(f"oras manifest fetch {shlex.quote(reference)}")
