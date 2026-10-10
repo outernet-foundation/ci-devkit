@@ -6,10 +6,10 @@ from subprocess import CalledProcessError
 
 from bashrun.bash import bash, bash_check, bash_output
 
-from .registry_auth import ensure_registry_login
+from build_artifact_registry.registry_auth import ensure_registry_login
 
 
-BUILD_MEDIA_TYPE = "application/vnd.ci-devkit.build.v1+raw"
+BUILD_MEDIA_TYPE = "application/vnd.build-artifact-registry.build.v1+raw"
 
 
 def build_reference(registry: str, project: str, platform: str, tag: str) -> str:

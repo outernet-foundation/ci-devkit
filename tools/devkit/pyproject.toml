@@ -1,5 +1,5 @@
 [project]
-name = "ci-devkit-devkit"
+name = "build-artifact-registry-devkit"
 version = "0"
 requires-python = ">=3.13"
 dependencies = ["python-devkit==0.1.15"]

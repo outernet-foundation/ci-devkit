@@ -1,7 +1,7 @@
 ci_workflow: release.yml
 packages:
-  ci-devkit:
+  build-artifact-registry:
     path: .
-    major_minor: "0.2"
+    major_minor: "0.1"
     registries:
-      pypi: ci-devkit
+      pypi: build-artifact-registry

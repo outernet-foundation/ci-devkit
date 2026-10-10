@@ -30,6 +30,17 @@ wheels = [
 ]
 
 [[package]]
+name = "build-artifact-registry-devkit"
+version = "0"
+source = { virtual = "." }
+dependencies = [
+    { name = "python-devkit" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "python-devkit", specifier = "==0.1.15" }]
+
+[[package]]
 name = "ci-devkit"
 version = "0.1.13"
 source = { registry = "https://pypi.org/simple" }
@@ -42,17 +53,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/0c/c3/4fa23868b52713a8e
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6a/9a/388cc8375cb2bab3c1cbb9d7d96eb5abb951a4b037aafbf3c88d4c02cae3/ci_devkit-0.1.13-py3-none-any.whl", hash = "sha256:7b08f1b21691e3855b7747e060e1bc6e441664386ba346093bd14bd5327cffdd", size = 25686, upload-time = "2026-09-28T07:48:30.104Z" },
 ]
-
-[[package]]
-name = "ci-devkit-devkit"
-version = "0"
-source = { virtual = "." }
-dependencies = [
-    { name = "python-devkit" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "python-devkit", specifier = "==0.1.15" }]
 
 [[package]]
 name = "colorama"

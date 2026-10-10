@@ -33,7 +33,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ci-devkit"
+name = "build-artifact-registry"
 version = "0.0.0.dev0"
 source = { editable = "." }
 dependencies = [

@@ -80,7 +80,7 @@ def save(registry: str, name: str, tag: str, source_directory: Path, paths: list
         bash(f"tar --zstd -cf {archive_path} {joined}", cwd=source_directory)
 
     reference = f"{registry}/{name}:{tag}"
-    bash(f"oras push {reference} {archive_name}:application/vnd.ci-devkit.cache.v1+zstd", cwd=staging)
+    bash(f"oras push {reference} {archive_name}:application/vnd.build-artifact-registry.cache.v1+zstd", cwd=staging)
     archive_path.unlink()
     print(f"Saved cache: {reference}")
 

@@ -8,10 +8,10 @@ from pathlib import Path
 
 from bashrun.bash import bash, bash_check
 
-from .registry_auth import ensure_registry_login
+from build_artifact_registry.registry_auth import ensure_registry_login
 
 
-def install_oras(version: str = "1.2.2") -> None:
+def install_oras(version: str = "1.2.2", *, registry: str | None = None) -> None:
     if not shutil.which("oras"):
         _download_oras(version)
 
@@ -23,7 +23,8 @@ def install_oras(version: str = "1.2.2") -> None:
         raise SystemExit(1)
 
     _ensure_zstd()
-    ensure_registry_login("ghcr.io")
+    if registry is not None:
+        ensure_registry_login(registry)
 
 
 def _download_oras(version: str) -> None:
@@ -36,7 +37,7 @@ def _download_oras(version: str) -> None:
         binary_directory = Path.home() / ".local" / "bin"
     elif system == "Windows":
         archive = f"oras_{version}_windows_amd64.zip"
-        binary_directory = Path.home() / ".cache" / "ci-devkit" / "oras"
+        binary_directory = Path.home() / ".cache" / "build-artifact-registry" / "oras"
     else:
         return
 
