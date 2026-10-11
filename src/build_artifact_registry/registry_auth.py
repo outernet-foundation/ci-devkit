@@ -6,12 +6,10 @@ from pathlib import Path
 
 from bashrun.bash import bash
 from pydantic import BaseModel, Field, ValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
 class RegistryEnvironment(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="CI_")
-
     registry_username: str = ""
     registry_token: str = ""
 
@@ -37,15 +35,13 @@ def ensure_registry_login(registry: str, *, username: str | None = None, token: 
             registry,
             environment.registry_username,
             environment.registry_token,
-            "CI_REGISTRY_USERNAME / CI_REGISTRY_TOKEN environment",
+            "REGISTRY_USERNAME / REGISTRY_TOKEN environment",
         )
         return
 
     host = _registry_host(registry)
     if environment.registry_username or environment.registry_token:
-        print(
-            "Warning: only one of CI_REGISTRY_USERNAME / CI_REGISTRY_TOKEN is set; skipping environment credential login"
-        )
+        print("Warning: only one of REGISTRY_USERNAME / REGISTRY_TOKEN is set; skipping environment credential login")
 
     ambient = _ambient_credential_source(host)
     if ambient is not None:
@@ -54,7 +50,7 @@ def ensure_registry_login(registry: str, *, username: str | None = None, token: 
 
     print(
         f"Registry auth for {host}: no credential resolved "
-        "(tried explicit parameter, CI_REGISTRY_USERNAME / CI_REGISTRY_TOKEN environment, docker config); "
+        "(tried explicit parameter, REGISTRY_USERNAME / REGISTRY_TOKEN environment, docker config); "
         "continuing with ambient or anonymous access"
     )
 
