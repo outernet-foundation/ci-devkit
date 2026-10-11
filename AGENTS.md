@@ -41,7 +41,7 @@ surface, checked with `uv lock --check --project tools/devkit`.
 | Module | Role |
 |---|---|
 | `builds.py` | OCI build artifacts over ORAS, separate from the cache: `build_reference(registry, project, platform, tag)` composes the shared shelf address `{registry}/{project}-{platform}:{tag}` (lowercased end-to-end); `push_build` pushes files as layers stamped `application/vnd.build-artifact-registry.build.v1+raw`; `pull_artifact` pulls immutable artifacts (no fallback tags), returns `True`, and raises when absent unless `required=False` makes absence a `False` return — the one-call form for consumers whose artifact is legitimately missing; `list_build_tags` queries. |
-| `registry_auth.py` | `ensure_registry_login(registry, *, username, token)` — the credential chain: explicit parameter → `CI_REGISTRY_USERNAME`/`CI_REGISTRY_TOKEN` environment → ambient docker config (credential helper / store / auth entry). Prints which source resolved; no `GITHUB_`-shaped input anywhere. |
+| `registry_auth.py` | `ensure_registry_login(registry, *, username, token)` — the credential chain: explicit parameter → `REGISTRY_USERNAME`/`REGISTRY_TOKEN` environment → ambient docker config (credential helper / store / auth entry). Prints which source resolved; no `GITHUB_`-shaped input anywhere. |
 | `cache.py` | OCI artifact cache over ORAS: `restore(registry, name, tag, target, *, required, fallback_tags)` pulls a tar+zstd artifact by tag with fallbacks; `save(registry, name, tag, source, paths)` packs glob-resolved paths and pushes. Registry names are lowercased (OCI rule vs GitHub case). Best-effort semantics — the deliberate contrast with `builds`. |
 | `setup_oras.py` | `install_oras(version, *, registry)` — best-effort ORAS CLI provisioning (downloads to `~/.local/bin` / `~/.cache/build-artifact-registry/oras` when absent; clear failure when un-installable) plus zstd provisioning; when `registry` is passed it logs in through the neutral credential chain, otherwise provisioning is registry-free. |
 
@@ -54,7 +54,7 @@ surface, checked with `uv lock --check --project tools/devkit`.
   is the single door for build-artifact I/O, and the reference convention (`build_reference`)
   lives here so upload and consumption sides cannot drift apart.
 - **No runner knowledge.** Registries, references, and credentials are the vocabulary;
-  workflow YAML maps runner secrets onto the neutral `CI_REGISTRY_*` environment. If a second
+  workflow YAML maps runner secrets onto the neutral `REGISTRY_*` environment. If a second
   CI platform ever arrives, the auth seam upgrades to a per-platform CredentialProvider — one
   implementor today is ceremony, not architecture.
 - **Builds ≠ caches.** `cache.py` keeps fallback-tag, best-effort semantics; `builds.py` is
