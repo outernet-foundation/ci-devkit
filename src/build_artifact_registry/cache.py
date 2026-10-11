@@ -7,7 +7,11 @@ import tempfile
 from pathlib import Path
 from subprocess import CalledProcessError
 
-from bashrun.bash import bash, bash_check, bash_pipe
+from bashrun.bash import bash, bash_output, bash_pipe
+
+from build_artifact_registry.registry_auth import ensure_registry_login
+
+REFUSAL_MARKERS = ("denied", "unauthorized", "forbidden", "authentication required")
 
 
 def restore(
@@ -21,6 +25,7 @@ def restore(
 ) -> bool:
     # OCI repository names must be lowercase; GitHub repository names preserve case
     registry = registry.lower()
+    ensure_registry_login(registry)
     staging = Path(tempfile.gettempdir()) / "cache"
 
     for candidate_tag in [tag, *(fallback_tags or [])]:
@@ -30,7 +35,13 @@ def restore(
         reference = f"{registry}/{name}:{candidate_tag}"
         staging.mkdir(parents=True, exist_ok=True)
 
-        if not bash_check(f"oras pull {reference} -o {staging}"):
+        try:
+            bash_output(f"oras pull {reference} -o {staging}")
+        except CalledProcessError as failure:
+            failure_details = f"{failure.output or ''}\n{failure.stderr or ''}".lower()
+            if any(marker in failure_details for marker in REFUSAL_MARKERS):
+                print(f"FATAL: Registry refused access to {reference} — auth failure, not a cache miss")
+                sys.exit(1)
             shutil.rmtree(staging, ignore_errors=True)
             continue
 
@@ -60,6 +71,7 @@ def restore(
 def save(registry: str, name: str, tag: str, source_directory: Path, paths: list[str]) -> None:
     # OCI repository names must be lowercase; GitHub repository names preserve case
     registry = registry.lower()
+    ensure_registry_login(registry)
     resolved: list[str] = []
     for pattern in paths:
         if any(character in pattern for character in "*?["):
